@@ -1,0 +1,1 @@
+1. Binary Search 的 left = mid + 1, right = mid - 1，不是 left = mid_num + 1, right = mid_num -1
