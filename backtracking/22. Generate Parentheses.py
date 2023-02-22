@@ -7,11 +7,11 @@ class Solution:
                 return
             if len(path) == n * 2: # open_count == close_count == n
                 res.append(''.join(path))
-            
+
             path.append('(')
             backtrack(open_count+1, close_count, path)
             path.pop()
-            
+
             path.append(')')
             backtrack(open_count, close_count+1, path)
             path.pop()
