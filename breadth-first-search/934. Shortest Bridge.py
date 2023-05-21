@@ -1,124 +1,54 @@
-LAND = 1
-WATER = 0
-I1 = 11
-I2 = 10
-MAX_DIST = 101
-
-DIR = {(0, 1), (0, -1), (1, 0), (-1, 0)}
-
 from collections import deque
-from typing import List
 
-class Solution:
-    def shortestBridge(self, grid: List[List[int]]) -> int:
-        n = len(grid)
+def shortestBridge(grid):
+    def dfs(i, j, firstIsland):
+        if i < 0 or i >= n or j < 0 or j >= n or grid[i][j] != 1:
+            return
+        grid[i][j] = -1 # mark first island -1
+        firstIsland.append((i, j)) # add points to first island
+        dfs(i - 1, j)
+        dfs(i + 1, j)
+        dfs(i, j - 1)
+        dfs(i, j + 1)
 
-        def neighbors(row, col):
-            for nx, ny in DIR:
-                nrow, ncol = row + nx, col + ny
-                if 0 <= nrow < n and 0 <= ncol < n:
-                    yield nrow, ncol
+    def expand(bridge):
+        """
+        BFS expand on all points of first island, and see which point can
+        reach second island in fewest steps.
+        Once reached second island, return immediately
+        """
+        steps = 0
+        while bridge:
+            size = len(bridge)
+            for _ in range(size):
+                i, j = bridge.popleft()
+                for dx, dy in directions:
+                    ni, nj = i + dx, j + dy
+                    if ni < 0 or ni >= n or nj < 0 or nj >= n or grid[ni][nj] == -1:
+                        continue # skip first island or visited water
+                    if grid[ni][nj] == 1: # reached second island, return immediately
+                        return steps
+                    grid[ni][nj] = -1 # mark all water visited
+                    bridge.append((ni, nj))
+            steps += 1
 
-        def dfs(i, j, queue):
-            grid[i][j] = -1
-            queue.append((i, j))
-            for x, y in neighbors(i,j):
-                if grid[x][y] == 1:
-                    dfs(x, y, queue)
+    n = len(grid)
+    firstIsland = []
+    directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
-        firsti, firstj = -1, -1
-        found = False
-        for i in range(n):
-            if found:
+    # Step 1: Identify the first island
+    found = False
+    for i in range(n):
+        if found:
+            break
+        for j in range(n):
+            if grid[i][j] == 1:
+                dfs(i, j, firstIsland)
+                found = True
                 break
-            for j in range(n):
-                if found:
-                    break
-                if grid[i][j] == 1:
-                    firsti, firstj = i, j
-                    found = True
 
-        step, queue = 0, deque()
-        dfs(firsti, firstj, queue)
+    # Step 2: Build the initial bridge from first island
+    bridge = deque(firstIsland)
 
-        while queue:
-            queuelen = len(queue)
-            for _ in range(queuelen):
-                i, j = queue.popleft()
-                for x, y in neighbors(i,j):
-                    if grid[x][y] == 1:
-                        return step
-                    elif grid[x][y] == 0:
-                        grid[x][y] = -1
-                        queue.append((x, y))
-            step += 1
-
-        return step
-
-
-    def shortestBridgeTLE(self, grid: List[List[int]]) -> int:
-        n = len(grid)
-        perimeter = set()
-
-        for i in range(n):
-            for j in range(n):
-                if grid[i][j] == LAND:
-                    hasWater = False
-                    # top
-                    if grid[max(0, i-1)][j] == WATER:
-                        hasWater = True
-                    # right
-                    if grid[i][min(n-1, j+1)] == WATER:
-                        hasWater = True
-                    # bottom
-                    if grid[min(n-1, i+1)][j] == WATER:
-                        hasWater = True
-                    # left
-                    if grid[i][max(0, j-1)] == WATER:
-                        hasWater = True
-                    if hasWater:
-                        perimeter.add((i, j))
-
-        def find_island(si, sj, code):
-            queue = deque([(si, sj)])
-            while len(queue):
-                x, y = queue.popleft()
-                grid[x][y] = code
-
-                for dx, dy in DIR:
-                    nx, ny = x + dx, y + dy
-                    if 0 <= nx < n and 0 <= ny < n and grid[nx][ny] == LAND:
-                        queue.append((nx, ny))
-
-        i1marked = False
-
-        for i in range(n):
-            for j in range(n):
-                if grid[i][j] == LAND:
-                    if not i1marked:
-                        find_island(i, j, I1)
-                        i1marked = True
-                    else:
-                        find_island(i, j, I2)
-
-        def bfs(si, sj, this_code, that_code): # return min dist to the otherside
-            min_dist = MAX_DIST
-            visited = set()
-            queue = deque([(si, sj, -1)])
-            while len(queue):
-                x, y, d = queue.popleft()
-                visited.add((x, y))
-                if d > 0 and grid[x][y] == that_code:
-                    min_dist = min(min_dist, d)
-                else:
-                    for dx, dy in DIR:
-                        nx, ny = x + dx, y + dy
-                        if 0 <= nx < n and 0 <= ny < n and (nx, ny) not in visited and (grid[nx][ny] == WATER or (nx, ny) in perimeter and grid[nx][ny] == that_code):
-                            queue.append((nx, ny, d+1))
-            return min_dist
-
-        dist = MAX_DIST
-        for (si, sj) in perimeter:
-            that_code = I2 if grid[si][sj] == I1 else I1
-            dist = min(dist, bfs(si, sj, grid[si][sj], that_code))
-        return dist
+    # Step 3: Expand the bridge
+    return expand(bridge)
