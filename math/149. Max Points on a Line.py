@@ -13,6 +13,10 @@ class Solution:
             for j in range(i+1, n):
                 x2, y2 = points[j]
 
+                # no need to worry about intercept bcs
+                # the slope calculates from the same starting point (x1, y1) for every other x2, y2
+                # no need to worry about pos/neg slope, because 
+                # the slope is same for two points no matter which direction you calc from
                 if x1 == x2:
                     slope = float('inf')
                 else:
