@@ -1,3 +1,5 @@
+#include <vector>
+using namespace std;
 class Solution {
 public:
     /**
@@ -27,6 +29,6 @@ public:
             }
         }
         int secondAns = firstAns^number;
-        return {firstAns,secondAns}; 
+        return {firstAns,secondAns};
     }
 };
