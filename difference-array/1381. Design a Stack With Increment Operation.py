@@ -29,6 +29,30 @@ class CustomStack:
         if self.inc:
             self.inc[min(k, len(self.inc)) - 1] += val
 
+    def sum(self) -> int:
+        s = 0
+        inc_acc = 0
+        for i in range(self.n-1, -1, -1):
+            inc_acc += self.inc[i]
+            num = self.nums[i]
+            s += (inc_acc + num)
+        return s
+
+if __name__ == '__main__':
+    cs = CustomStack(4)
+    cs.push(4)
+    cs.push(5)
+    cs.increment(2,1)
+    cs.push(6)
+    cs.push(7)
+    cs.increment(4,2)
+    assert cs.sum() == 32
+    assert cs.pop() == 9
+    assert cs.pop() == 8
+    assert cs.pop() == 8
+    assert cs.pop() == 7
+
+
 """
 solution from: https://leetcode.com/problems/design-a-stack-with-increment-operation/discuss/539716/JavaC%2B%2BPython-Lazy-increment-O(1)
 
