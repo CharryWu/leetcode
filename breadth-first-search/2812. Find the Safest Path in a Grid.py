@@ -1,0 +1,50 @@
+from collections import deque
+DIR = {(0, 1), (0, -1), (1, 0), (-1, 0)}
+class Solution:
+    def maximumSafenessFactor(self, grid: List[List[int]]) -> int:
+        bfs_queue = deque([])
+        m, n = len(grid), len(grid[0])
+
+        def is_safeval_valid(grid, visited, i, j, safeval):
+            if i < 0 or j < 0 or i >= m or j >= n or visited[i][j]:
+                return False
+            if i == m-1 and j == n-1:
+                return grid[m-1][n-1] >= safeval
+
+            visited[i][j] = True
+
+            for dx, dy in DIR:
+                nx, ny = i + dx, j + dy
+                if grid[i][j] >= safeval and is_safeval_valid(grid, visited, nx, ny, safeval):
+                    return True
+            return False
+
+        # BFS on 2D board to mark each cell's distance from nearest thieve
+        for i in range(m):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    bfs_queue.append((i, j))
+
+        while bfs_queue:
+            x, y = bfs_queue.popleft()
+            for dx, dy in DIR:
+                nx, ny = x+dx, y+dy
+                if 0 <= nx < m and 0 <= ny < n:
+                    if grid[nx][ny] == 0:
+                        grid[nx][ny] = grid[x][y]+1
+                        bfs_queue.append((nx, ny))
+                    else:
+                        grid[nx][ny] = min(grid[x][y]+1, grid[nx][ny])
+
+        ans = 0 # actual safeness factor, it's not known beforehand, we need to guess it, and verify if the guess is correct
+        l, r = 1, 400 # min possible safeval is 0 (dist 0 from thieve), the one-off val is 1, max is 400 which is entire grid
+        while l <= r: # use binary search to facilitate the guess
+            mid = (l+r) // 2
+            visited = [[False] * n for i in range(m)]
+            if is_safeval_valid(grid, visited, 0, 0, mid):
+                ans = max(ans, mid)
+                l = mid+1
+            else:
+                r = mid-1
+
+        return ans-1
