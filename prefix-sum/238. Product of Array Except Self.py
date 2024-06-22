@@ -19,22 +19,14 @@ class Solution:
 class Solution:
     def productExceptSelf(self, nums: List[int]) -> List[int]:
         n = len(nums)
-
         res = [1] * n
 
-        i = 0
-        cur = 1
-        while i < n:
-            res[i] = cur # 注意这句和下句的顺序不能颠倒。先写入res[i]保证res[i]存的是 i-1 的 running product
-            cur = cur * nums[i]
-            i += 1
-
-        cur = 1
-        i = n-1
-        while i >= 0:
-            res[i] = res[i] * cur
-            cur = cur * nums[i]
-            i -= 1
+        for i in range(1, n):
+            res[i] = res[i-1] * nums[i-1]
+        postfix = 1
+        for i in range(n-1, -1, -1):
+            res[i] = res[i] * postfix
+            postfix = postfix * nums[i]
 
         return res
 """
