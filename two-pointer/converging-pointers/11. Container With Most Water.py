@@ -2,7 +2,8 @@ class Solution:
     def maxArea(self, heights: List[int]) -> int:
         """
         Use two pointer, converge to the center
-        Each move only moves the shorter side such that can potentially meet higher height
+        Each move only moves the shorter side such that shorter height can potentially become higher
+        After each move recalculate the max container area
         """
         n = len(heights)
         i, j = 0, n-1
