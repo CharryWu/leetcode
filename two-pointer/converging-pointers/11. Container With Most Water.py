@@ -1,7 +1,8 @@
 class Solution:
     def maxArea(self, heights: List[int]) -> int:
         """
-        Use two pointer
+        Use two pointer, converge to the center
+        Each move only moves the shorter side such that can potentially meet higher height
         """
         n = len(heights)
         i, j = 0, n-1
