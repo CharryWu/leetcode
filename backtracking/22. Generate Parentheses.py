@@ -1,21 +1,30 @@
 class Solution:
     def generateParenthesis(self, n: int) -> List[str]:
+        """
+        Each position has two decisions, open or close parentheses
+        We can only add close parentheses when there's an open parentheses before it
+
+        only add open parenthesis if open < n
+        only add closing parenthesis if closed < open
+        valid IFF open == closed == n
+        """
+        stack = []
         res = []
-        def backtrack(open_count, close_count, path):
-            nonlocal res
-            if open_count > n or close_count > n or close_count > open_count:
+
+        def backtrack(openN, closedN):
+            if openN == closedN == n: # base case: found valid parenthesis
+                res.append("".join(stack))
                 return
-            if len(path) == n * 2: # open_count == close_count == n
-                res.append(''.join(path))
 
-            path.append('(')
-            backtrack(open_count+1, close_count, path)
-            path.pop()
+            if openN < n:
+                stack.append("(")
+                backtrack(openN+1, closedN)
+                stack.pop()
 
-            path.append(')')
-            backtrack(open_count, close_count+1, path)
-            path.pop()
+            if closedN < openN:
+                stack.append(")")
+                backtrack(openN, closedN+1)
+                stack.pop()
 
-
-        backtrack(0, 0, [])
+        backtrack(0, 0)
         return res
