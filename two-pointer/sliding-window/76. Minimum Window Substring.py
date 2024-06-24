@@ -20,8 +20,8 @@ class Solution:
             if c in countT and window[c] == countT[c]: # check if window satisfies condition of T
                 have += 1
 
-            while have == need: # met condition, forward left pointer (shrink window) until result is not met
-                if (r - l + 1) < resLen:
+            while have == need: # met condition, forward left pointer (shrink window) until condition is not met
+                if (r - l + 1) < resLen: # found new minimum length, update window length
                     res = [l, r]
                     resLen = r - l + 1
 
