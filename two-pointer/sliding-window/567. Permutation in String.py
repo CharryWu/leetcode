@@ -17,6 +17,8 @@ class Solution:
         # sliding window
         l = 0
         for r in range(n1, n2):
+            # s1Count stays same during loop, we will be adding or substracting s2Count based on
+            #
             if matches == 26:
                 return True
 
@@ -26,6 +28,8 @@ class Solution:
                 matches += 1
             elif s1Count[index] + 1 == s2Count[index]: # new char s2[r] introduces a mismatch
                 matches -= 1
+            # NOTE: can't directly use else condition for mismatch, because if duplicate characters
+            # exist, using else will double count mismatch
 
             index = ord(s2[l]) - ord("a")
             s2Count[index] -= 1
