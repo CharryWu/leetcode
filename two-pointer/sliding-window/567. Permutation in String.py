@@ -23,7 +23,7 @@ class Solution:
                 return True
 
             index = ord(s2[r]) - ord("a")
-            s2Count[index] += 1
+            s2Count[index] += 1 # new character into window, increment freq
             if s1Count[index] == s2Count[index]: # new char s2[r] makes up a match
                 matches += 1
             elif s1Count[index] + 1 == s2Count[index]: # new char s2[r] introduces a mismatch
@@ -32,7 +32,7 @@ class Solution:
             # exist, using else will double count mismatch
 
             index = ord(s2[l]) - ord("a")
-            s2Count[index] -= 1
+            s2Count[index] -= 1 # old character out window, decrement freq
             if s1Count[index] == s2Count[index]: # new char s2[l] makes up a match
                 matches += 1
             elif s1Count[index] - 1 == s2Count[index]: # new char s2[l] introduces a match
