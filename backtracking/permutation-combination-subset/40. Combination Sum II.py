@@ -39,15 +39,14 @@ class Solution:
             self.trackSum -= nums[i]
 
 
-
 class Solution:
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         candidates.sort()
         res = []
-        def dfs(pos, path, target):
-            if target == 0:
+        def dfs(pos, path, total):
+            if target == total:
                 res.append(path.copy())
-            if target < 0:
+            if target < total:
                 return
 
             prev = -1
@@ -55,9 +54,9 @@ class Solution:
                 if candidates[i] == prev:
                     continue
                 path.append(candidates[i])
-                dfs(i+1, path, target-candidates[i])
+                dfs(i+1, path, total+candidates[i])
                 path.pop()
                 prev = candidates[i]
 
-        dfs(0, [],  target)
+        dfs(0, [], 0)
         return res
