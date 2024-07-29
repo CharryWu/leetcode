@@ -37,3 +37,26 @@ class Solution:
             # 撤销选择
             self.track.pop()
             self.trackSum -= nums[i]
+
+
+class Solution:
+    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+        candidates.sort()
+        res = []
+        def dfs(pos, path, total):
+            if target == total:
+                res.append(path.copy())
+            if target < total:
+                return
+
+            prev = -1
+            for i in range(pos, len(candidates)):
+                if candidates[i] == prev:
+                    continue
+                path.append(candidates[i])
+                dfs(i+1, path, total+candidates[i])
+                path.pop()
+                prev = candidates[i]
+
+        dfs(0, [], 0)
+        return res
