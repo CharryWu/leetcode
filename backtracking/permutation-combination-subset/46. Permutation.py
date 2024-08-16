@@ -1,3 +1,4 @@
+import bisect
 class Solution:
     def permute(self, nums: List[int]) -> List[List[int]]:
         n = len(nums)
@@ -16,7 +17,7 @@ class Solution:
                 traverse()
                 path.pop()
                 visited.remove(nums[j])
-        
+
         traverse()
         return res
 
@@ -35,6 +36,6 @@ class Solution:
                 traverse(i+1)
                 path.pop()
                 nums[i], nums[j] = nums[j], nums[i]
-        
+
         traverse(0)
         return res
