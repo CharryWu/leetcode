@@ -42,3 +42,22 @@ print(solution(6, [1,2,2]))
 print(solution(1, [1]))
 print(solution(1, [1,2]))
 print(solution(2, [1,2]))
+
+
+# Second round
+# How to implement a triangle down arrow CSS? Use border
+# What is the box model in CSS?
+# Use JS to sort a list of version number: ["1.21.0","1.2.1","1.2.0","1.1.1","1.1.0","1.0.1","1.0.0"]. The version number could contain invalid characters
+
+# Final round (HM)
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        res = [0] * len(temperatures)
+        stack = [] # pair: [temp, index]
+        for i, t in enumerate(temperatures):
+            while stack and t > stack[-1][0]: # curTemp > top of stack, found a warmer temperature
+                stackT, stackInd = stack.pop()
+                res[stackInd] = (i-stackInd)
+            stack.append([t, i])
+
+        return res
