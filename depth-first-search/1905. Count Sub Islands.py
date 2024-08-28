@@ -1,6 +1,14 @@
 directions = {(0, 1), (1, 0), (0, -1), (-1, 0)}
 class Solution:
     def countSubIslands(self, grid1: List[List[int]], grid2: List[List[int]]) -> int:
+        """
+        We start by iterating through each cell in grid2.
+        Upon encountering an unvisited land cell,
+        we initiate a DFS to mark all connected land cells as visited.
+        During the traversal, we compare each cell in grid2 with the corresponding cell in grid1.
+        If any land cell in grid2 maps to a water cell in grid1, the island is disqualified.
+        If the island passes the check, it is counted as a sub-island.
+        """
         m, n = len(grid1), len(grid1[0])
 
         def dfs(x, y):
@@ -17,6 +25,8 @@ class Solution:
                     res &= dfs(x + dx, y + dy)
                 return res
             else:
+                # 1. (x, y) is not in boundary of grid1, return True to not interfere with check
+                # 2. grid2[x][y] == 0, return True to indicate that the current cell is not part of an island in grid2.
                 return True
 
         count = 0
