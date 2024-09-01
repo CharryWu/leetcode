@@ -1,40 +1,24 @@
-"""
-# Definition for a Node.
-class Node:
-    def __init__(self, val = 0, neighbors = None):
-        self.val = val
-        self.neighbors = neighbors if neighbors is not None else []
-"""
 
 class Solution:
-    def cloneGraph(self, source: 'Node') -> 'Node':
-        if not source:
-            return None
-        adj_list = {}
-        visited = [False] * 101
+    def cloneGraph(self, node: Optional['Node']) -> Optional['Node']:
+        """
+        Use dfs to clone
+        Need a mapping from newly created node to old node to set up neighbors during dfs
+        """
+        mapping = {} # old node => new node
 
-        def traverse(node):
-            if visited[node.val]:
-                return
-            neighborvals = []
-            for neighbor in node.neighbors:
-                neighborvals.append(neighbor.val)
-            adj_list[node.val] = neighborvals
+        def dfs_clone(node):
+            """
+            clone node and all its neighbors and adding all neighbors to newnode.neighbors
+            """
+            if not node:
+                return None
+            if node in mapping: # if new node has been created, don't create again
+                return mapping[node]
+            newnode = Node(node.val)
+            mapping[node] = newnode
+            for n in node.neighbors:
+                newnode.neighbors.append(dfs_clone(n))
+            return newnode
 
-            visited[node.val] = True
-            for neighbor in node.neighbors:
-                traverse(neighbor)
-
-
-        traverse(source)
-        node_list = [None] * 101
-        for key in adj_list:
-            node_list[key] = Node(key)
-
-        for key, neighbors in adj_list.items():
-            newneighbors = []
-            for neighbor in neighbors:
-                newneighbors.append(node_list[neighbor])
-            node_list[key].neighbors = newneighbors
-
-        return node_list[source.val]
+        return dfs_clone(node)
