@@ -397,3 +397,24 @@ class Solution:
                 return False
 
         return True
+
+############# 560. Subarray Sum Equals K ############
+from collections import Counter
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        """
+        Time O(N) | Space O(N)
+        Use prefix sum and frequency to count how many times prefix sum has seen
+        If current prefix sum - k has seen before, it means we have seen prefix sum - k before
+        and we have exactly seen[prefix-k] subarrays with sum = k
+        """
+        seen = Counter()
+        seen[0] += 1
+        prefix = 0
+        res = 0
+        for i, num in enumerate(nums):
+            prefix += num
+            if prefix - k in seen:
+                res += seen[prefix-k]
+            seen[prefix] += 1
+        return res
