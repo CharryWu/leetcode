@@ -355,7 +355,7 @@ class Solution:
         """
         Time O(n) | Space O(1)
         Two converging pointers, when encounter a mismatch, check if we can delete one character
-        at the left or right side
+        at the left or right side, then check if the remaining string is a palindrome
         """
         l, r = 0, len(s)-1
 
@@ -373,4 +373,27 @@ class Solution:
 
             l += 1
             r -= 1
+        return True
+
+############ 408. Valid Word Abbreviation ############
+class Solution:
+    def validWordAbbreviation(self, word: str, abbr: str) -> bool:
+        i, j = 0, 0
+        m, n = len(word), len(abbr)
+
+        while i < m and j < n:
+            if word[i] == abbr[j]:
+                i += 1
+                j += 1
+            elif abbr[j] == '0':
+                return False
+            elif abbr[j].isdigit():
+                k = j
+                while k < n and abbr[k].isdigit():
+                    k += 1
+                i += int(abbr[j:k])
+                j = k
+            else:
+                return False
+
         return True
