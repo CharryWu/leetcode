@@ -326,14 +326,19 @@ class Solution:
             If k > L + M, where M is size of mid group, than we can be sure, that we need to look into the right part.
         Finally, if none of these two condition holds, we need to look in the mid part,
             but because all elements there are equal, we can immedietly return mid[0].
-        Complexity: time complexity is O(n) in average, O(n^2) in worst case because on each time we reduce searching range approximately 2 times.
+        Complexity: time complexity is O(n) in average, because on each time we reduce searching range approximately 2 times.
         This is not strict proof, for more details you can do some googling. Space complexity is O(n) as well.
         """
         if not nums: return
         pivot = random.choice(nums)
-        left =  [x for x in nums if x > pivot]
-        mid  =  [x for x in nums if x == pivot]
-        right = [x for x in nums if x < pivot]
+        left, mid, right = [], [], []
+        for num in nums:
+            if num > pivot:
+                left.append(num)
+            elif num == pivot:
+                mid.append(num)
+            else:
+                right.append(num)
 
         L, M = len(left), len(mid)
 
