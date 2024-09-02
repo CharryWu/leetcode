@@ -1,24 +1,59 @@
 class Solution:
     def wordBreak(self, s: str, wordDict: List[str]) -> bool:
-        wordDictLen = list(map(lambda s: len(s), wordDict))
-        max_candidate_len, min_candidate_len = max(wordDictLen), min(wordDictLen)
-        wordDict = set(wordDict)
+        maxlen, minlen = float('-inf'), float('inf')
+        words = set(wordDict)
+        for word in words:
+            minlen = min(minlen, len(word))
+            maxlen = max(maxlen, len(word))
+
         n = len(s)
-        if n < min_candidate_len:
+        if n < minlen:
             return []
 
-        def dp(i, path, res):
-            if i == n: # base case，整个 s 都被拼出来了
-                res.append(' '.join(path))
-            elif n-i < min_candidate_len:
-                return
-            else:
-                for word in wordDict:
-                    if i+len(word) <= n and s[i:i+len(word)] == word:
-                        path.append(word)
-                        dp(i+len(word), path, res)
-                        path.pop()
+        res = []
 
-        res, path = [], []
-        dp(0, path, res)
+        def backtrack(i, path):
+            if i == n:
+                res.append(' '.join(path))
+                return
+            if i + minlen > n:
+                return
+
+            for word in words:
+                wordlen = len(word)
+                if i + wordlen > n:
+                    continue
+                if s[i:i+wordlen] == word:
+                    path.append(word)
+                    backtrack(i+wordlen, path)
+                    path.pop()
+
+        backtrack(0, [])
         return res
+
+# Memoized DP solution
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        words = set(wordDict)
+        memo = {}
+
+        def backtrack(substr):
+            """
+            substr: string that is a substring of the original string
+            return: list of valid strings that can be formed from s
+            """
+            if substr not in memo:
+                result = []
+                for word in words:
+                    wordlen = len(word)
+                    if substr[:wordlen] == word:
+                        # base case: s can be consumed wholly
+                        if len(substr) == wordlen:
+                            result.append(word)
+                        else: # s can be consumed partially
+                            for newword in backtrack(substr[wordlen:]):
+                                result.append(word + " " + newword)
+                memo[substr] = result
+            return memo[substr]
+
+        return backtrack(s)
