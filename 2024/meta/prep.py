@@ -1,3 +1,4 @@
+from typing import *
 ########## 162. Find Peak Element ##########
 class Solution:
     """
@@ -478,3 +479,105 @@ class Solution:
             return ans
 
         return max(maxsum(firstLen, secondLen), maxsum(secondLen, firstLen))
+
+############# 22. Generate Parentheses ############
+class Solution:
+    def generateParenthesis(self, n: int) -> List[str]:
+        res = []
+        def backtrack(opencount, closecount, path):
+            if opencount > n or closecount > n:
+                return
+            if opencount == closecount == n:
+                res.append(''.join(path))
+                return
+
+            # two options: place ( or )
+            # limitation: cannot place ) if closecount >= opencount
+            path.append('(')
+            backtrack(opencount+1, closecount, path)
+            path.pop()
+
+            if closecount < opencount:
+                path.append(')')
+                backtrack(opencount, closecount+1, path)
+                path.pop()
+
+        backtrack(0, 0, [])
+        return res
+
+############# 21. Merge Two Sorted Lists ############
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+class Solution:
+    def mergeTwoLists(self, list1: Optional[ListNode], list2: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = ListNode()
+        cur = dummy
+
+        while list1 and list2:
+            if list1.val < list2.val:
+                cur.next = list1
+                list1 = list1.next
+                cur = cur.next
+            else:
+                cur.next = list2
+                list2 = list2.next
+                cur = cur.next
+
+        if list1 or list2:
+            cur.next = list1 if list1 else list2
+
+        return dummy.next
+
+############# 129. Sum Root to Leaf Numbers ############
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+class Solution:
+    def sumNumbers(self, root: Optional[TreeNode]) -> int:
+        res = 0
+        def dfs(node, parentVal):
+            nonlocal res
+            if not node.left and not node.right:
+                res += (parentVal+node.val)
+                return
+
+            if node.left:
+                dfs(node.left, (parentVal+node.val)*10)
+            if node.right:
+                dfs(node.right, (parentVal+node.val)*10)
+        dfs(root, 0)
+        return res
+
+############# 1570. Dot Product of Two Sparse Vectors #############
+class SparseVector:
+    def __init__(self, nums):
+        """
+        Each non-zero value is saved as a (index, value) tuple
+        """
+        self.val = [(idx, num) for idx, num in enumerate(nums) if num != 0]
+
+    # Return the dotProduct of two sparse vectors
+    def dotProduct(self, vec):
+        """
+        Use two pointers i, j, pointing to self and vec
+        if self[i] and vec[j] points to same position, can do dot product;
+        if point to different position, product is zero, move pointer to smaller index to next
+        """
+        i, j = 0, 0
+        res = 0
+
+        while i < len(self.val) and j < len(vec.val):
+            if self.val[i][0] == vec.val[j][0]: # if index is same, can do dot product
+                res += self.val[i][1] * vec.val[j][1]
+                i += 1
+                j += 1
+            elif self.val[i][0] < vec.val[j][0]: # index not same, product is zero, skip to next
+                i += 1
+            else:
+                j += 1
+        return res

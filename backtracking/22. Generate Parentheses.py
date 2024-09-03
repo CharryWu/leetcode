@@ -8,23 +8,24 @@ class Solution:
         only add closing parenthesis if closed < open
         valid IFF open == closed == n
         """
-        stack = []
         res = []
-
-        def backtrack(openN, closedN):
-            if openN == closedN == n: # base case: found valid parenthesis
-                res.append("".join(stack))
+        def backtrack(opencount, closecount, path):
+            if opencount > n or closecount > n:
+                return
+            if opencount == closecount == n:
+                res.append(''.join(path))
                 return
 
-            if openN < n:
-                stack.append("(")
-                backtrack(openN+1, closedN)
-                stack.pop()
+            # two decisions: place ( or )
+            # limitation: cannot place ) if closecount >= opencount
+            path.append('(')
+            backtrack(opencount+1, closecount, path)
+            path.pop()
 
-            if closedN < openN:
-                stack.append(")")
-                backtrack(openN, closedN+1)
-                stack.pop()
+            if closecount < opencount:
+                path.append(')')
+                backtrack(opencount, closecount+1, path)
+                path.pop()
 
-        backtrack(0, 0)
+        backtrack(0, 0, [])
         return res
