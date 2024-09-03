@@ -1,8 +1,42 @@
 from collections import deque, defaultdict
 
-
 class Solution:
-    def ladderLength(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+    def ladderLengthBFS(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
+        """
+        Since we're getting MINIMUM transformation needed, use BFS
+        """
+        if beginWord == endWord:
+            return 0
+        wordset = set(wordList)
+        if endWord not in wordset:
+            return 0
+        mapping = defaultdict(list) # intermediary "c*t" => actual words
+        for word in wordset:
+            for i in range(len(word)):
+                intermediate = word[:i] + '*' + word[i+1:]
+                mapping[intermediate].append(word)
+
+        visited = set([beginWord])
+        queue = deque([beginWord])
+        res = 1 # at least one transformation to reach from beginWord to endWord
+
+        while queue:
+            for i in range(len(queue)):
+                word = queue.popleft()
+                if word == endWord:
+                    return res
+                visited.add(word)
+
+                for j in range(len(word)):
+                    pattern = word[:j] + '*' + word[j+1:]
+                    for neighbor in mapping[pattern]:
+                        if neighbor not in visited:
+                            visited.add(neighbor)
+                            queue.append(neighbor)
+            res += 1
+        return 0
+
+    def ladderLengthBFS2(self, beginWord: str, endWord: str, wordList: List[str]) -> int:
         if not beginWord or not wordList or not endWord or endWord not in wordList:
             return 0
 
