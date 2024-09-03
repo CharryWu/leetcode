@@ -611,3 +611,64 @@ class Solution:
 
         return res
 
+############# 71. Simplify Path ############
+class Solution:
+    def simplifyPath(self, path: str) -> str:
+        path = path.strip('/')
+        path = path.split('/')
+        res = []
+        for p in path:
+            if p == '' or p == '.':
+                continue
+            elif p == '..':
+                if len(res) > 0:
+                    res.pop()
+            else:
+                res.append(p)
+        return '/' + '/'.join(res)
+
+
+############# 1209. Remove All Adjacent Duplicates in String II ############
+class Solution:
+    def removeDuplicates(self, s: str, k: int) -> str:
+        stack = []
+        for c in s:
+            if not stack:
+                stack.append(c)
+                continue
+
+            # either c belongs to last consecutive k duplicate characters
+            # or c is a different character
+            if stack[-1][0] == c:
+                stack[-1] += c
+            else:
+                stack.append(c)
+
+            # remove stack[-1] if it is too long
+            while stack and len(stack[-1]) >= k:
+                top = stack.pop()
+                top = top[:len(top)-k]
+                if top != "": # has residual after remove k characters, add it back
+                    stack.append(top)
+                # merge last two strings if equal
+                if len(stack) >= 2 and stack[-1][0] == stack[-2][0]:
+                    stack.append(stack.pop() + stack.pop())
+        return ''.join(stack)
+
+############# 525. Contiguous Array ############
+class Solution:
+    def findMaxLength(self, nums: List[int]) -> int:
+        n = len(nums)
+        seen = {0: -1}
+        res = 0
+        parity = 0
+        for j, c in enumerate(nums):
+            if c == 0:
+                parity -= 1
+            else:
+                parity += 1
+            if parity not in seen:
+                seen[parity] = j
+            else:
+                res = max(res, j-seen[parity])
+        return res
