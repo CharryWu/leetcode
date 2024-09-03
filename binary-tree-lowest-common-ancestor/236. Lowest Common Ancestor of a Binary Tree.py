@@ -11,10 +11,10 @@ class Solution:
             return None
         if root == p or root == q:
             return root
-        
+
         left = self.lowestCommonAncestor(root.left, p, q)
         right = self.lowestCommonAncestor(root.right, p, q)
-        
+
         # 情况 1，如果 p 和 q 都在以 root 为根的树中，那么 left 和 right 一定分别是 p 和 q（从 base case 看出来的）。
         if left and right: # 左右子树存在 p 和 q
             return root

@@ -1,16 +1,16 @@
 class Solution:
     def missingElement(self, nums: List[int], k: int) -> int:
-        """
-        O(n) time complexity, n = len(nums)
-        """
         n = len(nums)
-        diff_count = 0
-        for i in range(1, n):
-            diff_count = nums[i] - nums[i-1] - 1
-            if (diff_count >= k):
-                return nums[i-1]+k
-            k -= diff_count
-        return nums[n-1]+k
+        i = 1
+        while i < n:
+            diff = nums[i] - nums[i-1]
+            if diff > k:
+                return nums[i-1] + k
+            else:
+                k -= (diff-1)
+            i += 1
+
+        return nums[n-1] + k
 
 """
 # Naive Approach: O(k) time complexity

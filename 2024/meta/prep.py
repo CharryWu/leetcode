@@ -713,3 +713,74 @@ class Solution:
         last.right = first
         first.left = last
         return first
+
+
+############# 236. Lowest Common Ancestor of a Binary Tree ############
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        """
+        情况 1，如果 p 和 q 都在以 root 为根的树中，函数返回的即使 p 和 q 的最近公共祖先节点。
+
+        情况 2，那如果 p 和 q 都不在以 root 为根的树中怎么办呢？函数理所当然地返回 null 呗。
+
+        情况 3，那如果 p 和 q 只有一个存在于 root 为根的树中呢？函数就会返回那个节点。
+        """
+        if not root:
+            return None
+        if root == p or root == q:
+            return root
+
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+
+        # 情况 1，如果 p 和 q 都在以 root 为根的树中，那么 left 和 right 一定分别是 p 和 q（从 base case 看出来的）。
+        if left and right: # 左右子树存在 p 和 q
+            return root
+        # 情况 2，左右子树都找不到 p 或 q，直接返回 null 表示当前子树不符合题目条件
+        if not left and not right:
+            return None
+        # 情况 3，如果 p 和 q 只有一个存在于 root 为根的树中，函数返回该节点。
+        # Edge case: 如果 p 是 q 的父节点，或 q 是 p 父节点，那么最后返回的也是该父节点
+        return left if left else right
+
+############# 1060. Missing Element in Sorted Array ############
+class Solution:
+    def missingElement(self, nums: List[int], k: int) -> int:
+        n = len(nums)
+        i = 1
+        while i < n:
+            diff = nums[i] - nums[i-1]
+            if diff > k:
+                return nums[i-1] + k
+            else:
+                k -= (diff-1)
+            i += 1
+
+        return nums[n-1] + k
+
+############# 973. K Closest Points to Origin ############
+import heapq
+class Solution:
+    def kClosest(self, points: List[List[int]], k: int) -> List[List[int]]:
+        heap = [] # maxheap
+
+        for x, y in points:
+            dist = x**2+y**2
+            if len(heap) < k or dist < -heap[0][0]:
+                heapq.heappush(heap, (-dist, x, y))
+            if len(heap) > k:
+                heapq.heappop(heap)
+        return list(map(lambda x: (x[1],x[2]), heap))
+
+############# 1047. Remove All Adjacent Duplicates In String #############
+class Solution:
+    def removeDuplicates(self, s: str) -> str:
+        stack = []
+        for c in s:
+            stack.append(c)
+            while len(stack) >= 2 and stack[-1] == stack[-2]:
+                stack.pop()
+                stack.pop()
+
+
+        return ''.join(stack)
