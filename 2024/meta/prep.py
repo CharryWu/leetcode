@@ -672,3 +672,44 @@ class Solution:
             else:
                 res = max(res, j-seen[parity])
         return res
+
+############# 426. Convert Binary Search Tree to Sorted Doubly Linked List #############
+class Solution:
+    def treeToDoublyList(self, root: 'Optional[Node]') -> 'Optional[Node]':
+        def dfs(node):
+            """
+            Performs standard inorder traversal:
+            left -> node -> right
+            and links all nodes into DLL
+            """
+            nonlocal last, first
+            if node:
+                # left
+                dfs(node.left)
+
+                # node
+                if last:
+                    # link the previous node (last)
+                    # with the current one (node)
+                    last.right = node
+                    node.left = last
+                else:
+                    # keep the smallest node
+                    # to close DLL later on
+                    first = node
+                last = node
+
+                # right
+                dfs(node.right)
+
+        if not root:
+            return None
+
+        # the smallest (first) and the largest (last) nodes
+        first, last = None, None
+        dfs(root)
+
+        # close DLL
+        last.right = first
+        first.left = last
+        return first
