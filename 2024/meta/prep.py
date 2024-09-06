@@ -784,3 +784,40 @@ class Solution:
 
 
         return ''.join(stack)
+
+
+############# 116. Populating Next Right Pointers in Each Node II #############
+
+class Solution:
+    def connect(self, root: 'Optional[Node]') -> 'Optional[Node]':
+        def traverse(left, right):
+            if not left or not right:
+                return
+            left.next = right
+            traverse(left.left, left.right)
+            traverse(left.right, right.left)
+            traverse(right.left, right.right)
+        if root:
+            traverse(root.left, root.right)
+        return root
+
+############# 117. Populating Next Right Pointers in Each Node II #############
+class Solution:
+    def connect(self, root: 'Optional[Node]') -> 'Optional[Node]':
+
+        if not root:
+            return None
+        queue = deque([root])
+        while queue:
+            sz = len(queue)
+            for i in range(sz):
+                node = queue.popleft()
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+
+                if i < sz-1: # don't set the next pointer of last node of the same level,
+                    # otherwise it will point to first node of next level
+                    node.next = queue[0]
+        return root
