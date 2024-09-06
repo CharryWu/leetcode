@@ -676,42 +676,41 @@ class Solution:
 ############# 426. Convert Binary Search Tree to Sorted Doubly Linked List #############
 class Solution:
     def treeToDoublyList(self, root: 'Optional[Node]') -> 'Optional[Node]':
-        def dfs(node):
-            """
-            Performs standard inorder traversal:
-            left -> node -> right
-            and links all nodes into DLL
-            """
-            nonlocal last, first
-            if node:
-                # left
-                dfs(node.left)
-
-                # node
-                if last:
-                    # link the previous node (last)
-                    # with the current one (node)
-                    last.right = node
-                    node.left = last
-                else:
-                    # keep the smallest node
-                    # to close DLL later on
-                    first = node
-                last = node
-
-                # right
-                dfs(node.right)
-
+        """
+        思路：输入是bst，所以可以利用中序遍历 guarantee 访问的顺序是从小到大的。
+        利用一个 last 指针指向上个中序遍历节点，将其和当前node节点连接
+        再利用一个 first 指针指向第一个（最小）节点，在所有遍历完成之后将其和 last 指针互相连接完成闭环
+        """
         if not root:
             return None
 
-        # the smallest (first) and the largest (last) nodes
         first, last = None, None
-        dfs(root)
+        def dfs(node):
+            """
+            1. 递归调用 node.left
+            2. 将当前节点 node 和上一个中序遍历节点 last 连接起来 或赋值 first 指针。
+               每次中序遍历总是更新 last 指针指向当前node
+            3. 递归调用 node.right
 
-        # close DLL
-        last.right = first
+            返回值：不需要返回任何值，所有修改节点指针操作均为 in-place
+            """
+            nonlocal first
+            nonlocal last
+            if not node:
+                return
+            dfs(node.left)
+            if last:
+                last.right = node
+                node.left = last
+            else:
+                first = node
+            last = node
+            dfs(node.right)
+            return
+
+        dfs(root)
         first.left = last
+        last.right = first
         return first
 
 
@@ -785,6 +784,33 @@ class Solution:
 
         return ''.join(stack)
 
+############ 207. Course Schedule ############
+from collections import defaultdict
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        mapping = defaultdict(list) # prerequisite => descendant
+
+        def dfs(course, mapping, visiting):
+            if course in visiting:
+                return False # cycle detected
+            if len(mapping[course]) == 0: # no descendant
+                return True
+
+            visiting.add(course)
+            for desc in mapping[course]:
+                if not dfs(desc, mapping, visiting): return False
+            visiting.remove(course)
+            mapping[course] = []
+
+            return True
+
+        for a, b in prerequisites:
+            mapping[b].append(a)
+        visiting = set()
+        for i in range(numCourses):
+            if not dfs(i, mapping, visiting):
+                return False
+        return True
 
 ############# 116. Populating Next Right Pointers in Each Node II #############
 
