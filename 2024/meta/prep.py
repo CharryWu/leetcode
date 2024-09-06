@@ -821,3 +821,78 @@ class Solution:
                     # otherwise it will point to first node of next level
                     node.next = queue[0]
         return root
+
+
+############# 658. Find K Closest Elements ############
+class Solution:
+    def findClosestElements(self, arr: List[int], k: int, x: int) -> List[int]:
+        n = len(arr)
+        left, right = 0, n
+        while left < right:
+            mid = (left+right) // 2
+            if x <= arr[mid]:
+                right = mid
+            else:
+                left = mid+1
+        center = left
+        if center == n or (arr[center] != x and center > 0 and abs(x-arr[center-1]) < abs(x-arr[center])):
+            center -= 1
+        left, right = center, center # [left, right), right exclusive
+        for i in range(k):
+            # print(left, right)
+            # either decrement left or increment right
+            if left == 0:
+                right += 1
+            elif right >= n:
+                left -= 1
+            elif x-arr[left-1] < arr[right]-x:
+                left -= 1
+            elif x-arr[left-1] > arr[right]-x:
+                right += 1
+            else:
+                left -= 1
+        return arr[left:right]
+
+############ 865. Smallest Subtree with all the Deepest Nodes ############
+############# 1123. Lowest Common Ancestor of Deepest Leaves ############
+class Solution:
+    def lcaDeepestLeaves(self, root: Optional[TreeNode]) -> Optional[TreeNode]:
+
+        def dfs(node):
+            if not node:
+                return None, 0
+            leftfound, leftlevel = dfs(node.left)
+            rightfound, rightlevel = dfs(node.right)
+
+            if leftlevel > rightlevel:
+                return leftfound, leftlevel+1
+            if leftlevel < rightlevel:
+                return rightfound, rightlevel+1
+
+            return node, leftlevel+1
+
+        return dfs(root)[0]
+
+
+############# 16. 3Sum Closest ############
+class Solution:
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        res = float('inf')
+        diff = float('inf')
+        nums.sort()
+        n = len(nums)
+        for i in range(n-2):
+            j, k = i+1, n-1
+            while j < k:
+                s = nums[i] + nums[j] + nums[k]
+                d = s-target
+                if abs(d) < diff:
+                    res = s
+                    diff = abs(d)
+                if d > 0:
+                    k -= 1
+                elif d < 0:
+                    j += 1
+                else:
+                    return target
+        return res
