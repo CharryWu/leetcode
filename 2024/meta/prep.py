@@ -505,6 +505,38 @@ class Solution:
         backtrack(0, 0, [])
         return res
 
+
+############# 39. Combination Sum ############
+class Solution:
+    def combinationSum(self, candidates: List[int], target: int) -> List[List[int]]:
+        """
+        N = len(candidates), T = target, M = min(candidates)
+        N-ary Tree height = T/M
+        Total nodes in N-ary tree = N^(T/M+1)
+        Time O(N^(T/M+1)) | Space O(T/M)
+        """
+        candidates.sort()
+        n = len(candidates)
+        res = []
+        def backtrack(i, path, total):
+            if total == target:
+                res.append(path.copy())
+                return
+            elif total > target:
+                return
+
+            else:
+                for j in range(i, n):
+                    # If candidates contains duplicates, need to skip by checking (j > 0 and candidates[j] == candidates[j-1])
+                    path.append(candidates[j])
+                    backtrack(j, path, total+candidates[j])
+                    path.pop()
+
+        backtrack(0, [], 0)
+        print(res)
+        return res
+
+
 ############# 21. Merge Two Sorted Lists ############
 # Definition for singly-linked list.
 class ListNode:
@@ -589,26 +621,23 @@ class Solution:
         m, n = len(s), len(t)
         if n > m:
             return ""
-        cs, ct = Counter(), Counter(t)
+        window, need = Counter(), Counter(t)
         res = ""
-        i, j = 0, 0 # left, right pointer to s
 
-        def valid(window, need):
+        def isValid(window, need):
             for c in need.keys():
                 if window[c] < need[c]:
                     return False
             return True
 
-        while j < m:
-            cs[s[j]] += 1
-            j += 1
-
-            while i < j and valid(cs, ct):
-                if j-i < len(res) or res == "":
-                    res = s[i:j]
-                cs[s[i]] -= 1
+        i = 0
+        for j, c in enumerate(s):
+            window[c] += 1
+            while i <= j and isValid(window, need):
+                if j-i+1 < len(res) or res == "":
+                    res = s[i:j+1]
+                window[s[i]] -= 1
                 i += 1
-
         return res
 
 ############# 71. Simplify Path ############
@@ -672,6 +701,21 @@ class Solution:
             else:
                 res = max(res, j-seen[parity])
         return res
+
+
+############# 56. Merge Intervals ############
+class Solution:
+    def merge(self, intervals: List[List[int]]) -> List[List[int]]:
+        intervals.sort() # do normal sort of based on start value so mergeable intervals are next to each other
+
+        output = [intervals[0]]
+
+        for start, end in intervals:
+            if start <= output[-1][1]:
+                output[-1][1] = max(output[-1][1], end)
+            else:
+                output.append([start, end])
+        return output
 
 ############# 426. Convert Binary Search Tree to Sorted Doubly Linked List #############
 class Solution:
