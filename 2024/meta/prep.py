@@ -180,7 +180,28 @@ class Solution:
             res = self.myPow(x, n//2)
             return res ** 2
 
+########## 384. Shuffle an Array ##########
+import random
+class Solution:
+    def __init__(self, nums: List[int]):
+        self.original = nums
+        self.cur = nums.copy()
 
+    def reset(self) -> List[int]:
+        self.cur = self.original.copy()
+        return self.cur
+
+    def shuffle(self) -> List[int]:
+        """
+        Time O(n) | O(1) Extra Space
+        """
+        n = len(self.cur)
+        for i in range(n-1, 0, -1):
+            random_idx = random.randint(0, i)
+            self.cur[i], self.cur[random_idx] = self.cur[random_idx], self.cur[i]
+        return self.cur
+
+########## 295. Find Median from Data Stream ##########
 import heapq
 class MedianFinder:
     """
@@ -856,6 +877,90 @@ class Solution:
                 return False
         return True
 
+############ 346. Moving Average from Data Stream ############
+from collections import deque
+class MovingAverage:
+
+    def __init__(self, size: int):
+        self.window = deque()
+        self.size = size
+        self.sum = 0
+
+    def next(self, val: int) -> float:
+        self.window.append(val)
+        self.sum += val
+        if len(self.window) > self.size:
+            self.sum -= self.window.popleft()
+
+        return self.sum / len(self.window)
+
+############ 227. Basic Calculator II ############
+OPERANDS = set('+-*/')
+class Solution:
+    def calculate(self, s: str) -> int:
+        """
+        We use a stack to keep track of numbers and intermediate results.
+        We iterate through the string, building up numbers digit by digit.
+        When we encounter an operator or reach the end of the string, we perform the operation based on the previous sign:
+
+        For '+', we push the number onto the stack.
+        For '-', we push the negative of the number.
+        For '*', we pop the last number, multiply it by the current number, and push the result.
+        For '/', we pop the last number, divide it by the current number (using integer division), and push the result.
+
+
+        After processing all characters, we sum up all numbers in the stack to get the final result.
+        """
+        stack = [] # only stores intermediary value result, in the end res == sum(stack)
+        num = 0
+        lastsign = '+'
+
+        for i, char in enumerate(s):
+            if char.isdigit():
+                num = num * 10 + int(char)
+
+            if char in OPERANDS or i == len(s)-1:
+                # when a new sign is encountered, we flush the current number
+                # and immediately compute last expression consisting of stack[-1] OPERAND curnum
+                # and reset curnum to zero, and update last sign
+                if lastsign == '+':
+                    stack.append(num)
+                elif lastsign == '-':
+                    stack.append(-num)
+                elif lastsign == '*':
+                    stack.append(stack.pop() * num)
+                elif lastsign == '/':
+                    stack.append(int(stack.pop() / num)) # caveat: don't use //, because // rounds UP when result is negative
+
+                lastsign = char
+                num = 0
+
+        return sum(stack)
+
+
+############ 16. 3Sum Closest ############
+class Solution:
+    def threeSumClosest(self, nums: List[int], target: int) -> int:
+        res = float('inf')
+        diff = float('inf')
+        nums.sort()
+        n = len(nums)
+        for i in range(n-2):
+            j, k = i+1, n-1
+            while j < k:
+                s = nums[i] + nums[j] + nums[k]
+                d = s-target
+                if abs(d) < diff:
+                    res = s
+                    diff = abs(d)
+                if d > 0:
+                    k -= 1
+                elif d < 0:
+                    j += 1
+                else:
+                    return target
+        return res
+
 ############# 116. Populating Next Right Pointers in Each Node II #############
 
 class Solution:
@@ -892,6 +997,73 @@ class Solution:
                     node.next = queue[0]
         return root
 
+############# 727. Minimum Window Subsequence ############
+class Solution:
+    def minWindow(self, s1: str, s2: str) -> str:
+        """
+        dp[i][j] stores the LARGEST starting index in s1 of the substring
+            where s2 has length i and the window ends at j-1 (s2[:i] is totally included in first j characters s1[:j])
+
+        So dp[i][j] would be:
+        if s2[i - 1] == s1[j - 1], this means we could borrow the start index from dp[i - 1][j - 1] to make the current substring valid;
+        else, we only need to borrow the start index from dp[i][j - 1] which could either exist or not.
+
+        Finally, go through the last row to find the substring with min length and appears first.
+        """
+        n, m = len(s1), len(s2)
+
+        # Initialize the DP array, m+1 rows and n+1 columns
+        dp = [[-1] * (n + 1) for _ in range(m + 1)] # dp[i][j] stores the LARGEST starting index in s1 of the substring
+
+        # when s2 is empty string, the min window in s1 that includes it is still empty string
+        # by definition, dp[i][j] stores largest index of min window that ends at j-1 (or first j chars s[:j])
+        # so the min window that includes empty string AND ends at j-1 starts at (s1[j:j] == "")
+        for j in range(n + 1):
+            dp[0][j] = j # s1[j:j] == "" includes s2[:0] == ""
+
+        # Fill the dp array
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                # s1[dp[i-1][j-1]:j-1] includes a valid subsequence of s2[:i-1] && s1[j] == s2[i]
+                # => s1[dp[i][j]:j] includes a valid subsequence of s2[:i]
+                if s2[i - 1] == s1[j - 1]: # current matching s1[j] == s2[i] belongs to same window as s1[j-1] == s2[i-1]
+                    dp[i][j] = dp[i - 1][j - 1]
+                else: # if no match, need stricter condition: find s2[:i] in first j-1 characters of s1. The start index is same if found
+                    dp[i][j] = dp[i][j - 1]
+
+
+        # Now find the minimum length window
+        start, length = 0, n + 1
+        for j in range(1, n + 1):
+            if dp[m][j] != -1:
+                if j - dp[m][j] < length:
+                    start = dp[m][j]
+                    length = j - dp[m][j]
+
+        return "" if length == n + 1 else s1[start : start + length]
+
+############# 543. Diameter of Binary Tree ############
+class Solution:
+    def diameterOfBinaryTree(self, root: Optional[TreeNode]) -> int:
+        res = 0
+
+        def dfs(node):
+            """
+            DFS returns the depth of the tree from current root
+            Each recursive call updates res with two-way path passing root node
+            Leaf node: 0, None node: -1, so adding one to none equals zero (don't contribute to path length)
+            """
+            nonlocal res
+            if not node:
+                return -1
+
+            left, right = dfs(node.left), dfs(node.right)
+            res = max(res, 2+left+right) # maxlen duo-way path passing current node
+
+            return 1 + max(left, right) # maxlen single-way path from deepest leave up to current node
+
+        dfs(root)
+        return res
 
 ############# 658. Find K Closest Elements ############
 class Solution:
@@ -922,6 +1094,43 @@ class Solution:
             else:
                 left -= 1
         return arr[left:right]
+
+############# 88. Merge Sorted Array ############
+class Solution:
+    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:
+        """
+        Do not return anything, modify nums1 in-place instead.
+        """
+        i, j = m-1, n-1
+        k = len(nums1)-1
+
+        while i >= 0 and j >= 0:
+            if nums1[i] > nums2[j]:
+                nums1[k] = nums1[i]
+                i -= 1
+            else:
+                nums1[k] = nums2[j]
+                j -= 1
+
+            k -= 1
+
+        while j >= 0:
+            nums1[k] = nums2[j]
+            k -= 1
+            j -= 1
+
+############ 398. Random Pick Index ############
+from collections import defaultdict
+import random
+class Solution:
+
+    def __init__(self, nums: List[int]):
+        self.d = defaultdict(list)
+        for i, num in enumerate(nums):
+            self.d[num].append(i)
+
+    def pick(self, target: int) -> int:
+        return random.choice(self.d[target])
 
 ############ 865. Smallest Subtree with all the Deepest Nodes ############
 ############# 1123. Lowest Common Ancestor of Deepest Leaves ############
@@ -965,4 +1174,109 @@ class Solution:
                     j += 1
                 else:
                     return target
+        return res
+
+
+############# 79. Word Search ############
+DIR = {(0, 1), (0, -1), (-1, 0), (1, 0)}
+VISITED_SENTINEL = '#' # any character that will not appear in word charset
+class Solution:
+    def exist(self, board: List[List[str]], word: str) -> bool:
+        m, n = len(board), len(board[0])
+        def backtrack(x, y, wordi):
+            if wordi == len(word):
+                return True
+            if not (0 <= x < m and 0 <= y < n):
+                return False # cannot match if out of bound
+            if board[x][y] != word[wordi]:
+                return False
+
+            original = board[x][y]
+            board[x][y] = VISITED_SENTINEL
+
+            for dx, dy in DIR:
+                nx, ny = x+dx, y+dy
+                if backtrack(nx, ny, wordi+1):
+                    board[x][y] = original
+                    return True
+
+            board[x][y] = original
+            return False
+
+        for i in range(m):
+            for j in range(n):
+                if backtrack(i, j, 0):
+                    return True
+        return False
+
+
+############# 791. Custom Sort String ############
+from collections import Counter
+class Solution:
+    def customSortString(self, order: str, s: str) -> str:
+        freq = Counter(s)
+        res = ""
+        for char in order:
+            res += char * freq[char]
+            del freq[char]
+
+        for char, f in freq.items():
+            res += char * f
+        return res
+
+############# 30. Substring with Concatenation of All Words ############
+# Solution with illustration https://leetcode.com/problems/substring-with-concatenation-of-all-words/solutions/1753357/clear-solution-easy-to-understand-with-diagrams-o-n-x-w-approach/
+class Solution:
+    def findSubstring(self, s: str, words: List[str]) -> List[int]:
+        """
+        Let wordlen = len(words[0])
+        Time O(len(s) * wordlen)
+        Use two hashmaps + two pointers
+        - `need` one hashmap to count all frequencies of each word in words
+        - `window` one to count current each substring's frequency in current window s[left:left+wordlen*len(words)]
+        - `matched_substrs` count how many words in window has been matched
+
+        We consider all such windows starting from 0, 1, 2, 3, ... wordlen-1, each time moving left/right pointer by wordlen.
+        This problem effectively is a combination of wordlen sliding window problems.
+         i  ---> i+w ---> i+2w ----> i+3w ----> i+4w
+         (i+1)  ---> (i+1)+w ---> (i+1)+2w ----> (i+1)+3w ----> (i+1)+4w
+         (i+2)  ---> (i+2)+w ---> (i+2)+2w ----> (i+2)+3w ----> (i+2)+4w
+         (i+3)  ---> (i+3)+w ---> (i+3)+2w ----> (i+3)+3w ----> (i+3)+4w
+
+        If there's a mismatch at right pointer, we move left pointer to right of right pointer because
+        any window that includes the mismatch is invalid window. Also we need to reset counter to zero
+
+        If advancing right pointer causes excess of substring in current window, we shrink the window size by wordlen and
+        update substring count in `window` hashmap accordingly
+        """
+        need = Counter(words) # substr => frequency in `words`
+        res = []
+        wordlen = len(words[0])
+
+        for k in range(wordlen):
+            window = Counter() # window substr => frequency in s[left:right], right == i + wordlen*len(words)
+            left = k
+            matched_substrs = 0 # sum of all frequencies in `window`. matched_substrs == sum(window.values())
+            for right in range(left, len(s), wordlen):
+                if right + wordlen > len(s): # out of bounds, cannot form window
+                    break
+                nextsubstr = s[right:right+wordlen]
+                if nextsubstr in need: # matched
+                    window[nextsubstr] += 1
+                    matched_substrs += 1
+                    while window[nextsubstr] > need[nextsubstr]: # matched, but excess, need move left pointer till no excess
+                        oldsubstr = s[left:left+wordlen]
+                        window[oldsubstr] -= 1
+                        matched_substrs -= 1
+                        left += wordlen
+                    if matched_substrs == len(words): # yay! we found a permutation of words
+                        res.append(left)
+                        window[s[left:left+wordlen]] -= 1
+                        matched_substrs -= 1
+                        left += wordlen
+                else: # mismatch, reset counter, and move left
+                    window.clear()
+                    matched_substrs = 0
+                    left = right + wordlen
+
         return res
