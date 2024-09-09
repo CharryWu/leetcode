@@ -1341,6 +1341,86 @@ class Solution:
 
         return max_island
 
+############# 339. Nested List Weight Sum ############
+# """
+# This is the interface that allows for creating nested lists.
+# You should not implement it, or speculate about its implementation
+# """
+#class NestedInteger:
+#    def __init__(self, value=None):
+#        """
+#        If value is not specified, initializes an empty list.
+#        Otherwise initializes a single integer equal to value.
+#        """
+#
+#    def isInteger(self):
+#        """
+#        @return True if this NestedInteger holds a single integer, rather than a nested list.
+#        :rtype bool
+#        """
+#
+#    def add(self, elem):
+#        """
+#        Set this NestedInteger to hold a nested list and adds a nested integer elem to it.
+#        :rtype void
+#        """
+#
+#    def setInteger(self, value):
+#        """
+#        Set this NestedInteger to hold a single integer equal to value.
+#        :rtype void
+#        """
+#
+#    def getInteger(self):
+#        """
+#        @return the single integer that this NestedInteger holds, if it holds a single integer
+#        Return None if this NestedInteger holds a nested list
+#        :rtype int
+#        """
+#
+#    def getList(self):
+#        """
+#        @return the nested list that this NestedInteger holds, if it holds a nested list
+#        Return None if this NestedInteger holds a single integer
+#        :rtype List[NestedInteger]
+#        """
+
+class Solution:
+    def depthSum(self, nestedList: List[NestedInteger]) -> int:
+        def dfs(ls, depth):
+            s = 0
+            for element in ls:
+                if element.isInteger():
+                    s += depth * element.getInteger()
+                else:
+                    s += dfs(element.getList(), depth+1)
+            return s
+
+        return dfs(nestedList, 1)
+
+
+############### 498. Diagonal Traverse ###############
+from collections import defaultdict
+class Solution:
+    def findDiagonalOrder(self, mat: List[List[int]]) -> List[int]:
+        """
+        2 key observations:
+        1. Diagonals are defined by the sum of indicies in a 2 dimensional array
+        2. The snake phenomena can be achieved by reversing every other diagonal level, therefore check if divisible by 2
+        """
+        d = defaultdict(list)
+        for i in range(len(mat)):
+            for j in range(len(mat[i])):
+                d[i+j].append(mat[i][j])
+        ans = []
+        for entry in d.items():
+            if entry[0] % 2 == 0:
+                ans.extend(entry[1][::-1])
+            else:
+                ans.extend(entry[1])
+        return ans
+
+
 
 ############# 269. Alien Dictionary ############
 from collections import defaultdict, deque
