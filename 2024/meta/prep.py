@@ -1340,3 +1340,71 @@ class Solution:
                     max_island = max(max_island, new_island_size)
 
         return max_island
+
+
+############# 269. Alien Dictionary ############
+from collections import defaultdict, deque
+class Solution:
+    def alienOrder(self, words: List[str]) -> str:
+        """
+        Detecting Cycle with Khan's Algorithm: If there is a cycle in the graph then result will not include all the nodes in the graph,
+        result will return only some of the nodes. To check if there is a cycle,
+        you just need to check whether the length of result is equal to the number of nodes in the graph, n.
+        """
+        # Step 1: Create a graph and in-degree count for each character
+        graph = defaultdict(set)
+        in_degree = {char: 0 for word in words for char in word} # can't use defaultdict(int) because BFS algorithm below adds neighbor if indegree is zero
+
+        # Step 2: Build the graph by comparing adjacent words
+        for i in range(len(words) - 1):
+            word1, word2 = words[i], words[i + 1]
+            min_len = min(len(word1), len(word2))
+
+            # Check if the second word is a prefix of the first one (invalid case)
+            if word1[:min_len] == word2[:min_len] and len(word1) > len(word2):
+                return ""
+
+            # Compare characters in the two words to establish the ordering
+            for j in range(min_len):
+                if word1[j] != word2[j]:
+                    if word2[j] not in graph[word1[j]]:
+                        graph[word1[j]].add(word2[j])
+                        in_degree[word2[j]] += 1
+                    break
+
+        # Step 3: Perform topological sort using Kahn's algorithm (BFS)
+        zero_in_degree_queue = deque([char for char in in_degree if in_degree[char] == 0])
+        result = []
+
+        while zero_in_degree_queue:
+            char = zero_in_degree_queue.popleft()
+            result.append(char)
+
+            # Decrease the in-degree of adjacent nodes
+            for neighbor in graph[char]:
+                in_degree[neighbor] -= 1
+                if in_degree[neighbor] == 0:
+                    zero_in_degree_queue.append(neighbor)
+
+        # If we have processed all characters, return the result
+
+        # check for cycle, if
+        if len(result) == len(in_degree):
+            return "".join(result)
+        else:
+            return ""
+
+############# 670. Maximum Swap ############
+class Solution:
+    def maximumSwap(self, num: int) -> int:
+        num_str = list(str(num))
+        last_seen = {}
+        for i, c in enumerate(num_str):
+            last_seen[int(c)] = i
+
+        for i, c in enumerate(num_str):
+            for d in range(9, int(c), -1):
+                if d in last_seen and last_seen[d] > i: # if there's a bigger digit after current index i, can make swap
+                    num_str[i], num_str[last_seen[d]] = num_str[last_seen[d]], num_str[i]
+                    return int(''.join(num_str)) # return immediately since we can only make one swap
+        return num # not found return original number
