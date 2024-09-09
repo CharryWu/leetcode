@@ -1280,3 +1280,14 @@ class Solution:
                     left = right + wordlen
 
         return res
+
+############# 1762. Buildings With an Ocean View #############
+class Solution:
+    def findBuildings(self, heights: List[int]) -> List[int]:
+        stack = []
+        for i, height in enumerate(heights):
+            while stack and height >= stack[-1][0]:
+                stack.pop()
+            stack.append((height, i))
+
+        return list(map(lambda x: x[1], stack))
