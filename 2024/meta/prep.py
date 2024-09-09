@@ -1291,3 +1291,52 @@ class Solution:
             stack.append((height, i))
 
         return list(map(lambda x: x[1], stack))
+
+############# 827. Making A Large Island ############
+class Solution:
+    def largestIsland(self, grid: List[List[int]]) -> int:
+        n = len(grid)
+
+        # Helper function to perform DFS and mark the islands with their area
+        def dfs(x, y, index):
+            # If the cell is out of bounds or is not land, return 0
+            if x < 0 or y < 0 or x >= n or y >= n or grid[x][y] != 1:
+                return 0
+
+            # Mark the cell with the index of the current island
+            grid[x][y] = index
+
+            # Explore the 4 directions and sum up the size
+            return 1 + dfs(x + 1, y, index) + dfs(x - 1, y, index) + dfs(x, y + 1, index) + dfs(x, y - 1, index)
+
+        # First pass: mark each island with a unique index and store their sizes
+        index = 2  # Start marking from 2 (as grid contains 0s and 1s)
+        island_sizes = {0: 0}  # Dictionary to hold sizes of islands, initialized with size 0 for water
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == 1:
+                    # Perform DFS and calculate the size of the island
+                    island_size = dfs(i, j, index)
+                    island_sizes[index] = island_size
+                    index += 1
+
+        # Second pass: for each 0, calculate the possible size if we flip it to 1
+        max_island = max(island_sizes.values())  # In case the grid is already all land
+        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]  # 4 possible directions
+
+        for i in range(n):
+            for j in range(n):
+                if grid[i][j] == 0:
+                    seen = set()
+                    new_island_size = 1  # Change the 0 to 1 and start with size 1
+                    for dx, dy in directions:
+                        ni, nj = i + dx, j + dy
+                        if 0 <= ni < n and 0 <= nj < n and grid[ni][nj] > 1:
+                            seen.add(grid[ni][nj])
+
+                    for idx in seen:
+                        new_island_size += island_sizes[idx]
+
+                    max_island = max(max_island, new_island_size)
+
+        return max_island
