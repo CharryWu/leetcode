@@ -1590,3 +1590,69 @@ class Solution:
 
         return res
 
+############# 249. Group Shifted Strings #############
+class Solution:
+    def groupStrings(self, strings: List[str]) -> List[List[str]]:
+        hashmap = defaultdict(list)
+        for s in strings:
+            key = []
+            for i in range(len(s) - 1):
+                # Throw in 26 so that we can normalzie below
+                difference = 26 + ord(s[i+1]) - ord(s[i])
+                # Wrap around
+                # z + 1 = a
+                key.append(str(difference % 26))
+            hashmap[','.join(key)].append(s)
+        return list(hashmap.values())
+
+
+############# 317. Shortest Distance from All Buildings #############
+EMPTY, BUILDING, OBSTACLE = 0, 1, 2
+DIR = {(0,-1), (-1,0), (0,1), (1,0)}
+
+class Solution:
+
+    def shortestDistance(self, grid: List[List[int]]) -> int:
+        buildings = []
+        candidate_lands = {} # {position, distance}
+
+        # 1. Find all buildings and candidate empty lands
+        for r in range(len(grid)):
+            for c in range(len(grid[r])):
+                if grid[r][c] == BUILDING:
+                    buildings.append((r, c))
+
+                elif grid[r][c] == EMPTY:
+                    candidate_lands[(r, c)] = 0
+
+        # 2. Compute min distance from each building to all candidate empty lands
+        for building_position in buildings:
+            self.compute_shortest_distances_bfs(candidate_lands, building_position)
+
+        return min(candidate_lands.values()) if buildings and candidate_lands else -1
+
+    def compute_shortest_distances_bfs(self, candidate_lands: dict, position: (int, int)):
+        """
+
+        """
+        distance = 0
+        visited = set()
+
+        queue = deque([position])
+        while queue:
+            distance += 1
+
+            for i in range(len(queue)):
+                x, y = queue.popleft()
+                for dx, dy in DIR:
+                    nx, ny = x+dx, y+dy
+
+                    if (nx, ny) in candidate_lands and (nx, ny) not in visited:
+                        visited.add((nx, ny))
+                        candidate_lands[(nx, ny)] += distance
+                        queue.append((nx, ny))
+
+        # 2. (Optimization, pruning) All empty lands that are not reachable from a building are excluded
+        if len(visited) != len(candidate_lands):
+            for position in set(candidate_lands.keys()).difference(visited):
+                candidate_lands.pop(position)
