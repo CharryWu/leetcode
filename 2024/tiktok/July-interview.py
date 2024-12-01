@@ -1,7 +1,8 @@
 
 
-# There are N buckets of apples. We would like to collect K apples from a row of continuous buckets.
-#  Write a function that returns the first buckets combo that would fulfil the requirement.
+# There are N buckets of apples. Each bucket contains a certain amount of apples designated by an integer buckets[i].
+# We would like to collect K apples from a row of continuous buckets.
+# Write a function that returns the first buckets combo that would fulfil the requirement.
 #  If there is no valid buckets, return []
 # Example 1:
 # Apples in buckets: [2, 3, 4, 5, 6, 2, 3]
@@ -48,7 +49,7 @@ print(solution(2, [1,2]))
 # How to implement a triangle down arrow CSS? Use border
 # What is the box model in CSS?
 # Use JS to sort a list of version number: ["1.21.0","1.2.1","1.2.0","1.1.1","1.1.0","1.0.1","1.0.0"]. The version number could contain invalid characters
-
+# Generate Subset
 # Final round (HM)
 class Solution:
     def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
