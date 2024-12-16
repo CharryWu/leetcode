@@ -8,7 +8,7 @@ Step 4: Repeat: When we removing these edges from x, we are decreasing the in-de
 Step 5. Detecting Cycle with Khan's Algorithm: If there is a cycle in the graph then result will not include all the nodes in the graph, result will return only some of the nodes. To check if there is a cycle, you just need to check whether the length of result is equal to the number of nodes in the graph, n.
 Why does this work?: Suppose there is a cycle in the graph: x1 -> x2 -> ... -> xn -> x1, then none of these nodes will appear in the list because their in-degree will not reach 0 during Khan's algorithm. Each node xi in the cycle can't be put into the queue q because there is always some other predecessor node x_(i-1) with an edge going from x_(i-1) to xi preventing this from happening.
 """
-
+from typing import *
 from collections import defaultdict, deque
 class Solution:
     def alienOrder(self, words: List[str]) -> str:
@@ -39,6 +39,7 @@ class Solution:
                     break
 
         # Step 3: Perform topological sort using Kahn's algorithm (BFS)
+        # Multi-source bfs, starting from every zero-in-degree node characters (which occurs earliest in the order)
         zero_in_degree_queue = deque([char for char in in_degree if in_degree[char] == 0])
         result = []
 
@@ -59,3 +60,4 @@ class Solution:
             return "".join(result)
         else:
             return ""
+print(Solution().alienOrder(["aaa", "aab", "aacxyz"]))
