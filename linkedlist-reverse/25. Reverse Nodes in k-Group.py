@@ -68,21 +68,35 @@ class Solution:
             # Terminate the loop when either
             # current == None or count >= k
             count = 0
+            # add current group nodes to the stack
             while curr and count < k:
                 stack.append(curr)
                 curr = curr.next
                 count += 1
 
+            if len(stack) < k:
+                if prev:
+                    prev.next = stack[0]
+                else:
+                    head = stack[0]
+                prev = stack[-1] if stack else None  # Update prev to the last node
+                stack.clear()  # Clear the stack for the next group
+                continue # If less than k nodes, do not reverse (last group)
+
             # Now pop the elements from the stack one by one
             while stack:
 
-                # If the final list has not been started yet
+
                 if not prev:
-                    prev = stack.pop()
-                    head = prev
+                    prev = stack.pop() # assign last node of current group to prev
+                    head = prev # last node of current group becomes the new head
                 else:
-                    prev.next = stack.pop()
-                    prev = prev.next
+                    # e.g. input is 1->..->10
+                    # 1->2->3->4->5 becomes 1<-2<-3<-4<-5
+                    # Then 5->4->3->2->1(prev) -> [10 <- 9 <- 8 <- 7 <- 6] ([] denotes stack)
+                    prev.next = stack.pop()      # |
+                    prev = prev.next             # v
+                    #                             None
 
         # Set the next pointer of the last node to None
         prev.next = None
