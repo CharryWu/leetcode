@@ -21,6 +21,10 @@ impl Solution {
             // 2. We must dereference 'count' to compare it to 0
             if *count == 0 {
                 // 3. .remove() takes a reference (&c)
+                // In C++, map.erase(key) usually takes the key value. In Rust, HashMap::remove takes a reference to the key (&K).
+                // Why? Rust tries to avoid taking ownership of data just to look it up in a map.
+                // If you passed c (the value), the function would "consume" it. By passing &c, you're just letting the Map "borrow" it to find the match.
+                // Fix: counter.remove(&c)
                 counter.remove(&c);
             }
         }
