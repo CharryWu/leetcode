@@ -6,16 +6,21 @@ struct Solution;
 
 impl Solution {
     pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
-        let mut grouped: HashMap<String, Vec<String>> = HashMap::new();
-        let mut counter: HashMap<char, usize> = HashMap::new();
+        let mut hashmap: HashMap<String, Vec<String>> = HashMap::new();
+        let mut grouped: Vec<Vec<String>> = Vec::new();
+
         for s in strs {
             let mut sorted: Vec<char> = s.chars().collect();
             sorted.sort();
             let sorted = sorted.into_iter().collect::<String>();
-            grouped.entry(sorted).or_insert(vec![]).push(s);
+            hashmap.entry(sorted).or_insert(vec![]).push(s);
         }
 
-        grouped.values().cloned().collect()
+        for (_key, value) in hashmap {
+            grouped.push(value);
+        }
+
+        grouped
     }
 }
 
